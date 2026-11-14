@@ -61,6 +61,14 @@ static_resources:
                       address: users
                       port_value: 8000
 
+      health_checks:
+        - timeout: 1s
+          interval: 3s
+          unhealthy_threshold: 2
+          healthy_threshold: 1
+          http_health_check:
+            path: /health
+
     - name: orders
       type: STRICT_DNS
       connect_timeout: 1s
