@@ -22,9 +22,23 @@ static_resources:
                       domains: ["*"]
                       routes:
                         - match:
-                            prefix: "/"
+                            prefix: "/users"
                           route:
                             cluster: users
+                            prefix_rewrite: "/"
+
+                        - match:
+                            prefix: "/orders"
+                          route:
+                            cluster: orders
+                            prefix_rewrite: "/"
+
+                        - match:
+                            prefix: "/"
+                          direct_response:
+                            status: 404
+                            body:
+                              inline_string: "no route\n"
 
                 http_filters:
                   - name: envoy.filters.http.router
@@ -35,6 +49,7 @@ static_resources:
     - name: users
       type: STRICT_DNS
       connect_timeout: 1s
+      lb_policy: ROUND_ROBIN
 
       load_assignment:
         cluster_name: users
@@ -44,6 +59,21 @@ static_resources:
                   address:
                     socket_address:
                       address: users
+                      port_value: 8000
+
+    - name: orders
+      type: STRICT_DNS
+      connect_timeout: 1s
+      lb_policy: ROUND_ROBIN
+
+      load_assignment:
+        cluster_name: orders
+        endpoints:
+          - lb_endpoints:
+              - endpoint:
+                  address:
+                    socket_address:
+                      address: orders
                       port_value: 8000
 
 admin:
