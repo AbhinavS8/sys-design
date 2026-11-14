@@ -1,0 +1,22 @@
+
+services:
+  envoy:
+    image: envoyproxy/envoy:v1.31-latest
+    ports:
+      - "8080:8080"
+      - "9901:9901"
+    volumes:
+      - ./envoy/envoy.yaml:/etc/envoy/envoy.yaml:ro
+    depends_on:
+      - users
+      - orders
+
+  users:
+    build: ./users
+    environment:
+      NAME: users
+
+  orders:
+    build: ./orders
+    environment:
+      NAME: orders
